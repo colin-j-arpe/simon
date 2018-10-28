@@ -20,11 +20,13 @@ let addToEnd = true;
 
 let startButton = $("#start-game");
 let gameType;
+let doubleUp;
+
 startButton.click(() => {
     startButton.attr("disabled", true);
     gameType = $("#game-type").val();
-console.log(gameType);
     addToEnd = gameType == 0;
+    doubleUp = $("#game-double").prop("checked") ? 2 : 1;
     sections.removeClass("wrong-guess");
     $("#score").text("0");
     nextTurn();
@@ -34,13 +36,15 @@ function nextTurn() {
 
     // let nextStep = (sequence[sequence.length - 1] + 1) % 4;
     //  nextStep = generate random number 0-3
-    if (addToEnd) {
-        sequence.push(Math.floor(Math.random() * 4));
-    }   else    {
-        sequence.unshift(Math.floor(Math.random() * 4));
-    }
-    if (gameType < 0) {
-        addToEnd = !addToEnd;
+    for (var i = 0; i < doubleUp; i++) {
+        if (addToEnd) {
+            sequence.push(Math.floor(Math.random() * 4));
+        }   else    {
+            sequence.unshift(Math.floor(Math.random() * 4));
+        }
+        if (gameType < 0) {
+            addToEnd = !addToEnd;
+        }
     }
 
     //  run sequence
@@ -95,7 +99,6 @@ function blink(section, showColour)    {
     blinkClass = showColour ? "blink" : "wrong-guess";
     blinkDuration = showColour ? 250 : 1000;
     toneIndex = showColour ? $(section).data("position") : 4;
-console.log(toneIndex);
     $(section).addClass(blinkClass);
     tones[toneIndex].play();
     setTimeout(() => {
