@@ -1,10 +1,14 @@
+body    {
+    background: #222;
+}
+
 .game-board {
     position: relative;
-    /*top: 60%;*/
+    top: 1rem;
     left: 50%;
     transform: translateX(-50%)/* translateY(-50%)*/;
-    width: 600px;
-    height: 600px;
+    width: 80vh;
+    height: 80vh;
 }
 
 .game-board__section    {
@@ -51,12 +55,29 @@
 }
 
 .controls {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
     margin-top: 2rem;
 }
 
-.controls * {
+.controls > * {
     padding: 0 1rem;
     font-size: 24px;
+    color: #eee;
+}
+
+.controls button    {
+    color: #111;
+}
+
+.controls select    {
+    font-size: 20px;
+}
+
+.controls input     {
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
 #score  {

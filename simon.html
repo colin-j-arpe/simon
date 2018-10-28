@@ -14,15 +14,21 @@
     </div>
     <div class="controls">
         <button id="start-game">Start Game</button>
-        <label for="game-type">Game style:</label>
-        <select name="game-type" id="game-type">
-            <option value="0">Classic</option>
-            <option value="1">Inverse</option>
-            <option value="-1">Alternating</option>
-        </select>
-        <label for="game-double">Double up! </label>
-        <input type="checkbox" name="game-double" id="game-double">
-        <span>Score: </span><span id="score">0</span>
+        <div>
+            <label for="game-type">Game style:</label>
+            <select name="game-type" id="game-type">
+                <option value="0">Classic</option>
+                <option value="1">Inverse</option>
+                <option value="-1">Alternating</option>
+            </select>
+        </div>
+        <div>
+            <label for="game-double">Double up! </label>
+            <input type="checkbox" name="game-double" id="game-double">
+        </div>
+        <div>
+            <span>Score: </span><span id="score">0</span>
+        </div>
     </div>
 </body>
 	<script type="text/javascript" src="Assets/Scripts/scripts.js"></script>
