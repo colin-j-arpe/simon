@@ -1,0 +1,63 @@
+.game-board {
+    position: relative;
+    /*top: 60%;*/
+    left: 50%;
+    transform: translateX(-50%)/* translateY(-50%)*/;
+    width: 600px;
+    height: 600px;
+}
+
+.game-board__section    {
+    position: absolute;
+    width: 48%;
+    height: 48%;
+    opacity: 1;
+}
+
+.blink  {
+    opacity: 0.5;
+}
+
+.game-board__upper-left {
+    left: 0;
+    top: 0;
+    border-top-left-radius: 100%;
+    background-color: red;
+}
+
+.game-board__upper-right {
+    right: 0;
+    top: 0;
+    border-top-right-radius: 100%;
+    background-color: blue;
+}
+
+.game-board__lower-right {
+    right: 0;
+    bottom: 0;
+    border-bottom-right-radius: 100%;
+    background-color: #ffdd00;
+}
+
+.game-board__lower-left {
+    left: 0;
+    bottom: 0;
+    border-bottom-left-radius: 100%;
+    background-color: green;
+}
+
+.wrong-guess    {
+    background-color: darkgrey;
+}
+
+.controls * {
+    padding: 0 1rem;
+    font-size: 24px;
+}
+
+#score  {
+    display: inline-block;
+    margin-left: 2rem;
+    font-size: 36px;
+    font-weight: 700;
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Simon</title>
+	<script type="text/javascript" src="Assets/Scripts/jquery-3.1.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="Assets/Styles/styles.css">
+</head>
+<body>
+    <div class="game-board">
+        <div id="upper-left" class="game-board__section game-board__upper-left" data-position="0"></div>
+        <div id="upper-right" class="game-board__section game-board__upper-right" data-position="1"></div>
+        <div id="lower-right" class="game-board__section game-board__lower-right" data-position="2"></div>
+        <div id="lower-left" class="game-board__section game-board__lower-left" data-position="3"></div>
+    </div>
+    <div class="controls">
+        <button id="start-game">Start Game</button>
+        <label for="game-type">Game style:</label>
+        <select name="game-type" id="game-type">
+            <option value="0">Classic</option>
+            <option value="1">Reverse</option>
+            <option value="-1">Alternating</option>
+        </select>
+        <p id="score">0</p>
+    </div>
+</body>
+	<script type="text/javascript" src="Assets/Scripts/scripts.js"></script>
+</html>
