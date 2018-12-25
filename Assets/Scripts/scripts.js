@@ -7,6 +7,7 @@ const LL = 3;
 //  const upperRight = $("#upper-right");
 
 const sections = $(".game-board__section");
+let selectedEvent;
 
 let tones = [];
 tones[0] = new Audio("Assets/Audio/tone3_Bb.wav");
@@ -51,7 +52,11 @@ function nextTurn() {
     displaySequence();
 
     //  check player's turn
-    checkPlayer();
+    if (selectedEvent == undefined) {
+        checkScreen();
+    }   else    {
+        checkPlayer();
+    }
 }
 
 function displaySequence()  {
@@ -59,10 +64,6 @@ function displaySequence()  {
     let sequenceFinished = setInterval(() => {
         let thisSection = $(sections[sequence[i]]);
         blink(thisSection, true);
-        // thisSection.addClass("blink");
-        // setTimeout(() => {
-        //     thisSection.removeClass("blink");
-        // }, 250);
         i++;
         if (i == sequence.length) {
             clearInterval(sequenceFinished);
@@ -70,9 +71,19 @@ function displaySequence()  {
     }, 500);
 }
 
+function checkScreen()  {
+    sections.on("click touchstart", (e) => {
+        sections.off();
+        selectedEvent = e.type;
+        console.log(selectedEvent);
+        checkPlayer();
+        $(e.target).trigger(selectedEvent);
+    });
+}
+
 function checkPlayer()  {
     let i = 0;
-    sections.click((e) => {
+    sections.on(selectedEvent, (e) => {
         let sectionClicked = e.currentTarget;
         if (sectionClicked != sections[sequence[i]]) {
             blink(sectionClicked, false);
@@ -92,7 +103,7 @@ function checkPlayer()  {
                 }, 500);
             }
         }
-    })
+    });
 }
 
 function blink(section, showColour)    {
