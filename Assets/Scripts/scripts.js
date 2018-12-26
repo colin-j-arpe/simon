@@ -35,8 +35,6 @@ startButton.click(() => {
 
 function nextTurn() {
 
-    // let nextStep = (sequence[sequence.length - 1] + 1) % 4;
-    //  nextStep = generate random number 0-3
     for (var i = 0; i < doubleUp; i++) {
         if (addToEnd) {
             sequence.push(Math.floor(Math.random() * 4));
@@ -77,7 +75,7 @@ function checkScreen()  {
         selectedEvent = e.type;
         console.log(selectedEvent);
         checkPlayer();
-        $(e.target).trigger(selectedEvent);
+        $(e.currentTarget).trigger(selectedEvent);
     });
 }
 
@@ -87,16 +85,12 @@ function checkPlayer()  {
         let sectionClicked = e.currentTarget;
         if (sectionClicked != sections[sequence[i]]) {
             blink(sectionClicked, false);
-            // $(sectionClicked).addClass("wrong-guess");
-            // setTimeout(() => {
-            //     $(sectionClicked).removeClass("wrong-guess");
-            // }, 1000);
             gameOver();
         }   else    {
             blink(sectionClicked, true);
             i++;
             if (i == sequence.length) {
-                sections.off("click");
+                sections.off(selectedEvent);
                 setTimeout(() => {
                     $("#score").text(sequence.length);
                     nextTurn();
@@ -121,6 +115,6 @@ function blink(section, showColour)    {
 
 function gameOver() {
     sequence = [];
-    sections.off("click");
+    sections.off(selectedEvent);
     startButton.removeAttr("disabled");
 }
