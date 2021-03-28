@@ -7,23 +7,28 @@ function useGameState()	{
 	const [gameOn, setGameOn] = React.useState(false);
 	const [showing, setShowing] = React.useState(false);
 	const [listening, setListening] = React.useState(false);
+	const [score, setScore] = React.useState(0);
 
 	const showingToListening = () => {
 		setShowing(false);
 		setListening(true);
 	}
 
-	const listeningToShowing = () => {
+	const listeningToShowing = newScore => {
+		setScore(newScore);
 		setListening(false);
 		setShowing(true);
 	}
 
 	const startGame = () => {
+		setScore(0);
 		setGameOn(true);
 		setShowing(true);
 	}
 
-	const endGame = () => {
+	const endGame = (newScore = null) => {
+		setScore(newScore ?? score);
+		setShowing(false);
 		setListening(false);
 		setGameOn(false);
 	}
@@ -32,12 +37,13 @@ function useGameState()	{
 		{
 			running: gameOn,
 			showing: showing,
-			listening: listening
+			listening: listening, 
+			score: score
 		},
 		{
 			start: startGame,
-			show: listeningToShowing,
 			listen: showingToListening,
+			show: listeningToShowing,
 			end: endGame
 		}
 	]
@@ -86,20 +92,34 @@ function Simon()	{
 	const [options, setOptions] = React.useState<{
 		gameType:-1|0|1,	//	-1: prepend; 1: append; 0: alternate/both
 		newElementsPerTurn:1|2,
-		beepDuration:number
+		beepDuration:number,
+		beepInterval:number,
+		inputInterval:number
 	}>({
 		gameType: 1,
 		newElementsPerTurn: 1,
-		beepDuration: 500
+		beepDuration: 500,
+		beepInterval:100,
+		inputInterval:1000
 	});
 
 	const [gameSequence, updateSequence, resetSequence] = useSequence(options);
 	const [gameState, setGameState] = useGameState<{}>(false);
 
+	function nextTurn()	{
+		updateSequence();
+		gameState.show();
+	}
+
+	function resetGame()	{
+		gameState.endGame();
+		resetSequence();
+	}
+
 	return (
 		<>
-			<Board sequence={gameSequence} beepDuration={options.beepDuration} nextTurn={updateSequence} reset={resetSequence} gameState={gameState} setGameState={setGameState} />
-			<Controls setOptions={setOptions} />
+			<Board sequence={gameSequence} beepDuration={options.beepDuration} nextTurn={nextTurn} reset={resetSequence} gameState={gameState} setGameState={setGameState} />
+			<Controls gameRunning={gameState.running} currentScore={gameState.score} options={options} setOptions={setOptions} startGame={setGameState.start} resetGame={resetGame} />
 		</>
 	);
 }

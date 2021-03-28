@@ -1,0 +1,19 @@
+.game-options-container	{
+	display: flex;
+	text-align: left;
+}
+
+.game-options 	{
+	margin: 12px;
+}
+
+.game-options-text	{
+	color: white;
+	font-size: 16px;
+}
+
+.game-options-label	{
+	color: white;
+	margin: 0 12px;
+	font-size: 24px;
+}
