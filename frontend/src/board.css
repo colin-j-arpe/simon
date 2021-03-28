@@ -1,0 +1,16 @@
+.gameBoard	{
+	height: 80vh;
+	width: 80vh;
+	margin: auto;
+	padding: 12px;
+}
+
+.gameButton	{
+	position: absolute;
+	display: inline-block;
+	height: 30vh;
+	width: 30vh;
+	border: 12px black;
+	border-top-left-radius: 100%;
+	transform-origin: bottom right; 
+}
