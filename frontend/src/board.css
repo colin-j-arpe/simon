@@ -1,11 +1,11 @@
-.gameBoard	{
+.game-board	{
 	height: 80vh;
 	width: 80vh;
 	margin: auto;
 	padding: 12px;
 }
 
-.gameButton	{
+.game-button	{
 	position: absolute;
 	display: inline-block;
 	height: 30vh;
@@ -13,4 +13,8 @@
 	border: 12px black;
 	border-top-left-radius: 100%;
 	transform-origin: bottom right; 
+}
+
+.game-button-beeping	{
+	opacity: 50%;
 }

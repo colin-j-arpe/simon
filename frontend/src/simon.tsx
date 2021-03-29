@@ -4,52 +4,69 @@ import Board from './board.tsx';
 import Controls from './controls.tsx';
 
 function useGameState()	{
-	const [gameOn, setGameOn] = React.useState(false);
-	const [showing, setShowing] = React.useState(false);
-	const [listening, setListening] = React.useState(false);
-	const [score, setScore] = React.useState(0);
+	const [gameStatus, setGameStatus] = React.useState<{
+		running:boolean;
+		showing:boolean;
+		listening:boolean;
+		score:number;
+	}>({
+		running: false,
+		showing: false,
+		listening: false,
+		score: 0
+	});
+	// const [running, setrunning] = React.useState(false);
+	// const [showing, setShowing] = React.useState(false);
+	// const [listening, setListening] = React.useState(false);
+	// const [score, setScore] = React.useState(0);
 
-	const showingToListening = () => {
-		setShowing(false);
-		setListening(true);
+	const showingToListening = () : void => {
+		setGameStatus({
+			...gameStatus,
+			showing: false,
+			listening: true
+		})
 	}
 
-	const listeningToShowing = newScore => {
-		setScore(newScore);
-		setListening(false);
-		setShowing(true);
+	const listeningToShowing = (newScore:number) : void => {
+		setGameStatus({
+			...gameStatus,
+			showing: true,
+			listening: false,
+			score: newScore
+		});
 	}
 
-	const startGame = () => {
-		setScore(0);
-		setGameOn(true);
-		setShowing(true);
+	const startGame = () : void => {
+		setGameStatus({
+			...gameStatus,
+			running: true,
+			showing: true,
+			score: 0
+		});
 	}
 
-	const endGame = (newScore = null) => {
-		setScore(newScore ?? score);
-		setShowing(false);
-		setListening(false);
-		setGameOn(false);
+	const endGame = (newScore:number = null) : void  => {
+		setGameStatus({
+			running: false,
+			showing: false,
+			listening: false,
+			score: newScore ?? gameStatus.score
+		});
 	}
 
 	return [
+		gameStatus,
 		{
-			running: gameOn,
-			showing: showing,
-			listening: listening, 
-			score: score
-		},
-		{
-			start: startGame,
-			listen: showingToListening,
-			show: listeningToShowing,
-			end: endGame
+			start: () => startGame(),
+			listen: () => showingToListening(),
+			show: () => listeningToShowing(),
+			end: () => endGame()
 		}
 	]
 }
 
-function useAddToEnd()	{
+function useAddToEnd() : [addNextElementToEnd:boolean, invert:object]	{
 	const [addNextElementToEnd, setAddNextElementToEnd] = React.useState<boolean>(true);
 
 	const invert = () => setAddNextElementToEnd(!addNextElementToEnd);
@@ -57,30 +74,36 @@ function useAddToEnd()	{
 	return [addNextElementToEnd, invert];
 }
 
-function useSequence({gameType, newElementsPerTurn})	{
+function useSequence(
+	{gameType, newElementsPerTurn}: {
+		gameType:number, 
+		newElementsPerTurn:number
+	}
+) : [
+	sequence:number[],
+	nextSequence:object,
+	reset:object
+]	{
 	const [sequence, setSequence] = React.useState<0|1|2|3[]>([]);
 	const [append, invertAppend] = useAddToEnd(gameType > -1);
 
-	const addToSequence = () => {
-		const nextElement = Math.floor(Math.random() * 4);
-		if (append) {
-			setSequence([...sequence, nextElement]);
-		}	else 	{
-			setSequence([nextElement, ...sequence]);
-		}
-
-		if (gameType === 0) {
-			invertAppend();
-		}
-	}
-
-	const nextSequence = () => {
+	const nextSequence = () : void => {
+		const sequenceCopy = [...sequence];
 		for (var i = 0; i < newElementsPerTurn; ++i) {
-			addToSequence();
+			if (append) {
+				sequenceCopy.push(Math.floor(Math.random() * 4));
+			}	else 	{
+				sequenceCopy.unshift(Math.floor(Math.random() * 4));
+			}
+			if (gameType === 0) {
+				invertAppend();
+			}
 		}
+
+		setSequence(sequenceCopy);
 	}
 
-	const reset = () => {
+	const reset = () : void => {
 		setSequence([]);
 	}
 
@@ -92,34 +115,44 @@ function Simon()	{
 	const [options, setOptions] = React.useState<{
 		gameType:-1|0|1,	//	-1: prepend; 1: append; 0: alternate/both
 		newElementsPerTurn:1|2,
-		beepDuration:number,
-		beepInterval:number,
-		inputInterval:number
+		timing: {
+			beepDuration:number,
+			beepInterval:number,
+			inputInterval:number
+		}
 	}>({
 		gameType: 1,
 		newElementsPerTurn: 1,
-		beepDuration: 500,
-		beepInterval:100,
-		inputInterval:1000
+		timing: {
+			beepDuration: 500,
+			beepInterval: 200,
+			inputInterval: 1000
+		}
 	});
 
 	const [gameSequence, updateSequence, resetSequence] = useSequence(options);
 	const [gameState, setGameState] = useGameState<{}>(false);
 
-	function nextTurn()	{
-		updateSequence();
-		gameState.show();
+	function resetGame() : void	{
+		setGameState.end();
+		resetSequence();
 	}
 
-	function resetGame()	{
-		gameState.endGame();
-		resetSequence();
+	function nextTurn() : void	{
+		updateSequence();
+		setGameState.show();
+	}
+
+	function startGame() : void {
+		resetGame();
+		updateSequence();
+		setGameState.start();
 	}
 
 	return (
 		<>
-			<Board sequence={gameSequence} beepDuration={options.beepDuration} nextTurn={nextTurn} reset={resetSequence} gameState={gameState} setGameState={setGameState} />
-			<Controls gameRunning={gameState.running} currentScore={gameState.score} options={options} setOptions={setOptions} startGame={setGameState.start} resetGame={resetGame} />
+			<Board sequence={gameSequence} timing={options.timing} nextTurn={nextTurn} reset={resetSequence} gameState={gameState} listen={() => setGameState.listen()} />
+			<Controls gameRunning={gameState.running} currentScore={gameState.score} options={options} setOptions={setOptions} startGame={startGame} resetGame={resetGame} />
 		</>
 	);
 }

@@ -21,7 +21,7 @@ const gameModes = [
 		description: 'New step will alternate between being added to the end and to the beginning of the sequence; in "Double Up!" mode, one new step each will be added to the end and the beginning of the sequence'
 	},
 ];
-function getDescription(code)	{
+function getDescription(code:number) : string	{
 	for (var mode of gameModes) {
 		if (mode.intCode === code) {
 			return mode.description;
@@ -30,18 +30,44 @@ function getDescription(code)	{
 	return `Error: mode ${code} not found`;
 }
 
-function GameType({current, update, disabled}) {
+function GameType(
+	{current, update, disabled}: {
+		current:number;
+		update:object;
+		disabled:boolean;
+	}
+)	{
 	return (
 		<>
 			<label htmlFor="game-mode-menu" className="game-options-label">Game Mode</label>
-			<select name="game-mode-menu" className="game-type-select" onChange={e => update(e.target.value)} disabled={disabled}>
-				{gameModes.map(mode => (<option key={mode.name} className="game-type-option" value={mode.intCode} selected={current === mode.intCode}>{mode.displayName}</option>))}
+			<select 
+				name="game-mode-menu" 
+				className="game-type-select" 
+				defaultValue={current} 
+				onChange={e => update(e.target.value)} 
+				disabled={disabled}
+			>
+				{gameModes.map(mode => (
+					<option 
+						key={mode.name} 
+						className="game-type-option" 
+						value={mode.intCode}
+					>
+						{mode.displayName}
+					</option>
+				))}
 			</select>
 		</>
 	);
 }
 
-function GameSpeed({current, update, disabled})	{
+function GameSpeed(
+	{current, update, disabled}: {
+		current:number;
+		update:object;
+		disabled:boolean;
+	}
+)	{
 	return (
 		<>
 			<label htmlFor="game-speed-slider" className="game-options-label">Game Speed</label>
@@ -59,13 +85,25 @@ function GameSpeed({current, update, disabled})	{
 	);
 }
 
-function Controls({gameRunning, currentScore, options, setOptions, startGame, resetGame})	{
-	function updateSpeeds(factor)	{
+function Controls(
+	{gameRunning, currentScore, options, setOptions, startGame, resetGame}: {
+		gameRunning:boolean;
+		currentScore:number;
+		options:object;
+		setOptions:object;
+		startGame:object;
+		resetGame:object;
+	}
+)	{
+	function updateSpeeds(factor:number) : void	{
+		const newTiming = {
+			beepDuration: (factor + 1) * 250,
+			beepInterval: factor * 200,
+			inputInterval: (factor + 1) * 500
+		};
 		setOptions({
 			...options,
-			beepDuration: (factor + 1) * 250,
-			beepInterval: factor * 100,
-			inputInterval: (factor + 1) * 500
+			timing: newTiming
 		});
 	}
 
@@ -95,14 +133,14 @@ function Controls({gameRunning, currentScore, options, setOptions, startGame, re
 			</div>
 			<div className="game-options game-options-speed">
 				<GameSpeed 
-					current={options.beepInterval / 100} 
+					current={options.timing.beepInterval / 200} 
 					update={updateSpeeds} 
 					disabled={gameRunning} 
 				/>
 				<div className="game-options-speed-desc game-options-text">
-					<p>Display Step Duration: {parseInt(options.beepDuration)}ms</p>
-					<p>Display Step Interval: {parseInt(options.beepInterval)}ms</p>
-					<p>Input Time Allowed: {parseInt(options.inputInterval)}ms</p>
+					<p>Display Step Duration: {parseInt(options.timing.beepDuration)}ms</p>
+					<p>Display Step Interval: {parseInt(options.timing.beepInterval)}ms</p>
+					<p>Input Time Allowed: {parseInt(options.timing.inputInterval)}ms</p>
 				</div>
 			</div>
 			<div className="game-options game-options-io">
@@ -110,8 +148,20 @@ function Controls({gameRunning, currentScore, options, setOptions, startGame, re
 					<p>Score: {currentScore}</p>
 				</div>
 				<div className="game-options-io-buttons game-options-label">
-					<button className="game-options-io-buttons-start" onClick={startGame} disabled={gameRunning}>Start Game</button>
-					<button className="game-options-io-buttons-reset" onClick={resetGame} disabled={!gameRunning}>Reset</button>
+					<button 
+						className="game-options-io-buttons-start" 
+						onClick={startGame} 
+						disabled={gameRunning}
+					>
+						Start Game
+					</button>
+					<button 
+						className="game-options-io-buttons-reset" 
+						onClick={resetGame} 
+						disabled={!gameRunning}
+					>
+						Reset
+					</button>
 				</div>
 			</div>
 		</div>
