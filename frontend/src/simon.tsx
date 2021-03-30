@@ -1,18 +1,20 @@
 import React from 'react';
 
-import {useGameState, useSequence} from './hooks.tsx';
-import Board from './board.tsx';
-import Controls from './controls.tsx';
+import {useGameState, useSequence} from './hooks';
+import Board from './board';
+import Controls from './controls';
 
 function Simon()	{
 	const [options, setOptions] = React.useState<{
-		gameType:-1|0|1;	//	-1: prepend; 1: append; 0: alternate/both
-		newElementsPerTurn:1|2;
+		gameType:number;	//	-1: prepend; 1: append; 0: alternate/both
+		newElementsPerTurn:number;
 		timingFactor:number;
+		volume:number;
 	}>({
 		gameType: 1,
-		newElementsPerTurn: 2,
-		timingFactor: 2
+		newElementsPerTurn: 1,
+		timingFactor: 1,
+		volume: 0.25
 	});
 
 	const timing = {
@@ -36,6 +38,8 @@ function Simon()	{
 
 	const [gameState, setGameState] = useGameState();
 
+	const roundScore = React.useRef(0);
+
 	function resetGame() : void	{
 		setGameState.end();
 		resetSequence();
@@ -43,13 +47,25 @@ function Simon()	{
 
 	function nextTurn() : void	{
 		updateSequence();
-		setGameState.show();
+		setGameState.show(roundScore.current);
 	}
 
 	function startGame() : void {
 		resetGame();
 		updateSequence();
 		setGameState.start();
+	}
+
+	function readClick(button:number) : void {
+		if (!gameState.listening) return;
+
+		if (button === sequence[seqIndex]) {
+console.log("correct");
+			roundScore.current++;
+			incrementSeqIndex();
+		}	else 	{
+			setGameState.end(roundScore.current);
+		}
 	}
 
 	React.useEffect(() => {
@@ -71,15 +87,20 @@ function Simon()	{
 		}
 
 		if (gameState.listening) {
+			roundScore.current = 0;
 			resetSeqIndex();
 		}
 	}, [gameState.showing, beeping]);
 
-
+	React.useEffect(() => {
+		if (gameState.listening && seqIndex === sequence.length) {
+			nextTurn();
+		}
+	}, [seqIndex]);
 
 	return (
 		<>
-			<Board currentBeep={beeping ? sequence[seqIndex] : -1} />
+			<Board currentBeep={beeping ? sequence[seqIndex] : -1} volume={options.volume} readClick={readClick} />
 			<Controls 
 				gameRunning={gameState.running} 
 				currentScore={gameState.score} 

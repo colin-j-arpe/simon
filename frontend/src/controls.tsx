@@ -85,6 +85,36 @@ function GameSpeed(
 	);
 }
 
+function AudioVolume(
+	{current, update}: {
+		current:number;
+		update:(n:number)=>void;
+	}
+)	{
+	return (
+		<>
+			<label htmlFor="game-volume-slider" className="game-options-label">Audio Volume</label>
+			<input 
+				type="range" 
+				name="game-volume-slider" 
+				className="game-options-volume-input" 
+				min={0} 
+				max={1} 
+				step={0.01} 
+				value={current} 
+				onChange={e => update(parseFloat(e.target.value))} 
+			/>
+		</>
+	);
+}
+
+interface GameOptions {
+	gameType:number; 
+	newElementsPerTurn:number; 
+	timingFactor:number;
+	volume:number;
+}
+
 function Controls(
 	{gameRunning, currentScore, options, timing, setOptions, startGame, resetGame}: {
 		gameRunning:boolean;
@@ -93,13 +123,14 @@ function Controls(
 			gameType:number;	//	-1: prepend; 1: append; 0: alternate/both
 			newElementsPerTurn:number;
 			timingFactor:number;
+			volume:number;
 		};
 		timing:{
 			beepDuration:number;
 			beepInterval:number;
 			inputInterval:number;
 		};
-		setOptions:(o:object)=>void;
+		setOptions:(opts:GameOptions)=>void;
 		startGame:()=>void;
 		resetGame:()=>void;
 	}
@@ -109,7 +140,7 @@ function Controls(
 			<div className="game-options game-options-type">
 				<GameType 
 					current={options.gameType} 
-					update={newValue => setOptions({...options, gameType: newValue})} 
+					update={(newValue:number) => setOptions({...options, gameType: newValue})} 
 					disabled={gameRunning}
 				/>
 				<div className="game-options-type-desc game-options-text">{getDescription(options.gameType)}</div>
@@ -131,13 +162,22 @@ function Controls(
 			<div className="game-options game-options-speed">
 				<GameSpeed 
 					current={options.timingFactor} 
-					update={newValue => setOptions({...options, timingFactor: newValue})} 
+					update={(newValue:number) => setOptions({...options, timingFactor: newValue})} 
 					disabled={gameRunning} 
 				/>
 				<div className="game-options-speed-desc game-options-text">
 					<p>Display Step Duration: {timing.beepDuration}ms</p>
 					<p>Display Step Interval: {timing.beepInterval}ms</p>
 					<p>Input Time Allowed: {timing.inputInterval}ms</p>
+				</div>
+			</div>
+			<div className="game-options game-options-volume">
+				<AudioVolume 
+					current={options.volume} 
+					update={(newValue:number) => setOptions({...options, volume: newValue})} 
+				/>
+				<div className="game-options-speed-desc game-options-text">
+					<p>Volume: {Math.floor(options.volume * 100)}</p>
 				</div>
 			</div>
 			<div className="game-options game-options-io">

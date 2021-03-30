@@ -52,12 +52,16 @@ function useGameState() : [
 		});
 	}
 
-	const endGame = (newScore:number = null) : void  => {
+	const endGame = (newScore:number|null = null) : void  => {
+		const finalScore = 
+			newScore && newScore > gameStatus.score 
+				? newScore 
+				: gameStatus.score;
 		setGameStatus({
 			running: false,
 			showing: false,
 			listening: false,
-			score: newScore ?? gameStatus.score
+			score: finalScore
 		});
 	}
 
@@ -87,7 +91,8 @@ function useSequence(
 	beeping:boolean,
 	beep:()=>void
 ]	{
-	const [sequence, setSequence] = React.useState<0|1|2|3[]>([3,2,3,2]);
+
+	const [sequence, setSequence] = React.useState<number[]>([]);
 	const [append, setAppend] = React.useState<boolean>(gameType > -1);
 	const [currentIndex, setCurrentIndex] = React.useState<number>(0);
 	const [beeping, setBeeping] = React.useState<boolean>(false);
@@ -141,5 +146,41 @@ function useSequence(
 		beep 
 	];
 }
+
+// function useAudio()	: [
+// 	tones:HTMLAudioElement[],
+// 	playTone:(n:number)=>void,
+// 	setVolume:(n:number)=>void,
+// 	stopAudio:()=>void
+// ]	{
+// 	const greenTone = require("./Audio/tone3_Bb.wav");
+// 	const redTone = require("./Audio/tone2_F.wav");
+// 	const blueTone = require("./Audio/tone0_Bb.wav");
+// 	const yellowTone = require("./Audio/tone1_Db.wav");
+// 	const failTone = require("./Audio/tone4_Ab.wav");
+
+// 	const [tones] = React.useState([
+// 		new Audio(greenTone.default),
+// 		new Audio(redTone.default),
+// 		new Audio(blueTone.default),
+// 		new Audio(yellowTone.default),
+// 		new Audio(failTone.default)
+// 	]);
+
+// 	const setVolume = (volume:number) => {
+// 		tones.forEach(tone => tone.volume = volume);
+// 	}
+
+// 	const playTone = (index:number) => tones[index].play();
+
+// 	const stopAudio = () => {
+// 		tones.forEach(tone => {
+// 			tone.pause();
+// 			tone.currentTime = 0;
+// 		});
+// 	}
+
+// 	return [tones, playTone, setVolume, stopAudio];
+// }
 
 export {useGameState, useSequence}
