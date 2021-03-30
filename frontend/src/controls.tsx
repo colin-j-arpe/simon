@@ -33,7 +33,7 @@ function getDescription(code:number) : string	{
 function GameType(
 	{current, update, disabled}: {
 		current:number;
-		update:object;
+		update:(n:number)=>void;
 		disabled:boolean;
 	}
 )	{
@@ -44,7 +44,7 @@ function GameType(
 				name="game-mode-menu" 
 				className="game-type-select" 
 				defaultValue={current} 
-				onChange={e => update(e.target.value)} 
+				onChange={e => update(parseInt(e.target.value))} 
 				disabled={disabled}
 			>
 				{gameModes.map(mode => (
@@ -64,7 +64,7 @@ function GameType(
 function GameSpeed(
 	{current, update, disabled}: {
 		current:number;
-		update:object;
+		update:(n:number)=>void;
 		disabled:boolean;
 	}
 )	{
@@ -86,33 +86,30 @@ function GameSpeed(
 }
 
 function Controls(
-	{gameRunning, currentScore, options, setOptions, startGame, resetGame}: {
+	{gameRunning, currentScore, options, timing, setOptions, startGame, resetGame}: {
 		gameRunning:boolean;
 		currentScore:number;
-		options:object;
-		setOptions:object;
-		startGame:object;
-		resetGame:object;
+		options:{
+			gameType:number;	//	-1: prepend; 1: append; 0: alternate/both
+			newElementsPerTurn:number;
+			timingFactor:number;
+		};
+		timing:{
+			beepDuration:number;
+			beepInterval:number;
+			inputInterval:number;
+		};
+		setOptions:(o:object)=>void;
+		startGame:()=>void;
+		resetGame:()=>void;
 	}
 )	{
-	function updateSpeeds(factor:number) : void	{
-		const newTiming = {
-			beepDuration: (factor + 1) * 250,
-			beepInterval: factor * 200,
-			inputInterval: (factor + 1) * 500
-		};
-		setOptions({
-			...options,
-			timing: newTiming
-		});
-	}
-
 	return (
 		<div className="game-options-container">
 			<div className="game-options game-options-type">
 				<GameType 
 					current={options.gameType} 
-					update={newValue => setOptions({...options, gameType: parseInt(newValue)})} 
+					update={newValue => setOptions({...options, gameType: newValue})} 
 					disabled={gameRunning}
 				/>
 				<div className="game-options-type-desc game-options-text">{getDescription(options.gameType)}</div>
@@ -133,14 +130,14 @@ function Controls(
 			</div>
 			<div className="game-options game-options-speed">
 				<GameSpeed 
-					current={options.timing.beepInterval / 200} 
-					update={updateSpeeds} 
+					current={options.timingFactor} 
+					update={newValue => setOptions({...options, timingFactor: newValue})} 
 					disabled={gameRunning} 
 				/>
 				<div className="game-options-speed-desc game-options-text">
-					<p>Display Step Duration: {parseInt(options.timing.beepDuration)}ms</p>
-					<p>Display Step Interval: {parseInt(options.timing.beepInterval)}ms</p>
-					<p>Input Time Allowed: {parseInt(options.timing.inputInterval)}ms</p>
+					<p>Display Step Duration: {timing.beepDuration}ms</p>
+					<p>Display Step Interval: {timing.beepInterval}ms</p>
+					<p>Input Time Allowed: {timing.inputInterval}ms</p>
 				</div>
 			</div>
 			<div className="game-options game-options-io">
@@ -152,16 +149,12 @@ function Controls(
 						className="game-options-io-buttons-start" 
 						onClick={startGame} 
 						disabled={gameRunning}
-					>
-						Start Game
-					</button>
+					>Start Game</button>
 					<button 
 						className="game-options-io-buttons-reset" 
 						onClick={resetGame} 
 						disabled={!gameRunning}
-					>
-						Reset
-					</button>
+					>Reset</button>
 				</div>
 			</div>
 		</div>

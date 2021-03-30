@@ -1,7 +1,23 @@
 import React from 'react';
-import './board.css';
 
-const colors = ['green', 'red', 'blue', 'yellow'];
+import './board.css';
+// import {useAudio} from './hooks.tsx';
+
+import greenTone from "./Audio/tone3_Bb.wav";
+import redTone from "./Audio/tone2_F.wav";
+import blueTone from "./Audio/tone0_Bb.wav";
+import yellowTone from "./Audio/tone1_Db.wav";
+import failTone from "./Audio/tone4_Ab.wav";
+
+const buttons = ['green', 'red', 'blue', 'yellow'];
+
+const tones = [
+	new Audio(greenTone), 
+	new Audio(redTone), 
+	new Audio(blueTone), 
+	new Audio(yellowTone), 
+	new Audio(failTone)
+];
 
 function Button({color, beeping, index})	{
 	return (
@@ -9,69 +25,28 @@ function Button({color, beeping, index})	{
 	);
 }
 
-function Board(
-	{sequence, timing, nextTurn, reset, gameState, listen}: {
-		sequence:number[],
-		timing:object,
-		nextTurn:object,
-		reset:object,
-		gameState:object,
-		listen:object
-	}
-)	{
-	const [buttons, setButtons] = React.useState<object[]>(colors.map(color => {return {color: color, beeping: false}}));
-	const [seqIndex, setSeqIndex] = React.useState<number>(0);
-
-	// function displaySequence() : void {
-
-	// 		let displaying = setInterval(() => {
-	// 			setTimeout(() => {
-	// 				beep(sequence[i++]);
-	// 				if (i === sequence.length) {
-	// 					clearInterval(displaying);
-	// 					setGameState.listen();
-	// 				}
-	// 			}, timing.beepInterval);
-	// 		}, timing.beepDuration);
-
-	// }
-
-	// function beep(index:number, failed = false) : void {
-	// 	const newButtons = [...buttons];
-	// 	newButtons[index]['beeping'] = true;
-	// 	setButtons(newButtons);
-	// 	setTimeout(() => {
-	// 		newButtons[index]['beeping'] = false;
-	// 		setButtons(newButtons);
-	// 	}, timing.beepDuration);
-	// }
-
-
-	if (gameState.showing && sequence.length) {
-		if (seqIndex === sequence.length) {
-			listen();
-			setSeqIndex(0);
+function Board({currentBeep}: {currentBeep:number})	{
+	// const [playAudio, stopAudio] = useAudio();
+	
+	React.useEffect(() => {
+		if (currentBeep === -1) {
+			tones.forEach(tone => {
+				tone.pause();
+				tone.currentTime = 0;
+			});
 		}	else 	{
-			if (buttons[seqIndex].beeping) {
-				setTimeout(() => {
-					const newButtons = [...buttons];
-					newButtons[seqIndex].beeping = false;
-					setButtons(newButtons);
-					setSeqIndex(seqIndex + 1);
-				}, timing.beepDuration);
-			}	else 	{
-				setTimeout(() => {
-					const newButtons = [...buttons];
-					newButtons[seqIndex].beeping = true;
-					setButtons(newButtons);
-				}, timing.beepInterval);
-			}
+			tones[currentBeep].play();
 		}
-	}
+	}, [currentBeep])
+
+	// if (currentBeep === -1) {
+	// 	stopAudio();
+	// }
+	// playAudio(currentBeep);
 
 	return (
 		<div className="game-board">
-			{buttons.map((button, index) => (<Button key={button.color} index={index} color={button.color} beeping={button.beeping} />))}
+			{buttons.map((button, index) => (<Button key={button} index={index} color={button} beeping={index === currentBeep} />))}
 		</div>
 	);
 }
