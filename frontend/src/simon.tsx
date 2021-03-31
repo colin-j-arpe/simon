@@ -46,8 +46,10 @@ function Simon()	{
 	}
 
 	function nextTurn() : void	{
-		updateSequence();
-		setGameState.show(roundScore.current);
+		setTimeout(() => {
+			updateSequence();
+			setGameState.show(roundScore.current);
+		}, timing.beepDuration);
 	}
 
 	function startGame() : void {
@@ -57,10 +59,7 @@ function Simon()	{
 	}
 
 	function readClick(button:number) : void {
-		if (!gameState.listening) return;
-
 		if (button === sequence[seqIndex]) {
-console.log("correct");
 			roundScore.current++;
 			incrementSeqIndex();
 		}	else 	{
@@ -100,7 +99,12 @@ console.log("correct");
 
 	return (
 		<>
-			<Board currentBeep={beeping ? sequence[seqIndex] : -1} volume={options.volume} readClick={readClick} />
+			<Board 
+				currentBeep={beeping ? sequence[seqIndex] : -1} 
+				volume={options.volume} 
+				listening={gameState.listening}
+				readClick={readClick}
+			/>
 			<Controls 
 				gameRunning={gameState.running} 
 				currentScore={gameState.score} 

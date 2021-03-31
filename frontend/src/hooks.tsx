@@ -93,22 +93,23 @@ function useSequence(
 ]	{
 
 	const [sequence, setSequence] = React.useState<number[]>([]);
-	const [append, setAppend] = React.useState<boolean>(gameType > -1);
 	const [currentIndex, setCurrentIndex] = React.useState<number>(0);
 	const [beeping, setBeeping] = React.useState<boolean>(false);
+
+	const append = React.useRef<boolean>(gameType > -1);
 
 	const addToSequence = () : void => {
 		setCurrentIndex(0);
 
 		const sequenceCopy = [...sequence];
 		for (var i = 0; i < newElementsPerTurn; ++i) {
-			if (append) {
+			if (append.current) {
 				sequenceCopy.push(Math.floor(Math.random() * 4));
 			}	else 	{
 				sequenceCopy.unshift(Math.floor(Math.random() * 4));
 			}
 			if (gameType === 0) {
-				setAppend(!append);
+				append.current = !append.current;
 			}
 		}
 
@@ -134,6 +135,8 @@ function useSequence(
 	const beep = () => {
 		setBeeping(true);
 	}
+
+	React.useEffect(() => {append.current = gameType > -1}, [gameType]);
 
 	return [
 		sequence, 

@@ -11,6 +11,15 @@ const blueTone = require("./Audio/tone0_Bb.wav");
 const yellowTone = require("./Audio/tone1_Db.wav");
 const failTone = require("./Audio/tone4_Ab.wav");
 
+const toneObjs = [
+	new Audio(greenTone.default),
+	new Audio(redTone.default),
+	new Audio(blueTone.default),
+	new Audio(yellowTone.default),
+	new Audio(failTone.default)
+];
+toneObjs.forEach(tone => tone.loop = true);
+
 const buttons = ['green', 'red', 'blue', 'yellow'];
 
 function Button({color, beeping, index, onClick}: {
@@ -28,39 +37,51 @@ function Button({color, beeping, index, onClick}: {
 	);
 }
 
-function Board({currentBeep: newBeep, volume, readClick}: {
+function Board({currentBeep, volume, listening, readClick}: {
 	currentBeep:number; 
 	volume:number; 
+	listening:boolean; 
 	readClick:(i:number)=>void;
 })	{
-	const beep = React.useRef(-1);
+	const tones = React.useRef<HTMLAudioElement[]>(toneObjs);
+	const toneReducer = (prev:number, next:number) => {
+		if (typeof prev === 'number' && prev !== -1) {
+			tones.current[prev].pause();
+			tones.current[prev].currentTime = 0;
+		}
 
-	const tones = React.useRef([
-		new Audio(greenTone.default),
-		new Audio(redTone.default),
-		new Audio(blueTone.default),
-		new Audio(yellowTone.default),
-		new Audio(failTone.default)
-	]);
+		if (typeof next === 'number' && next !== -1) {
+			tones.current[next].currentTime = 0;
+			tones.current[next].play();
+		}	else 	{
+			tones.current.forEach(tone => {
+				tone.pause();
+				tone.currentTime = 0;
+			});
+		}
+
+		return next;
+	}
+	const [playing, setPlaying] = React.useReducer(toneReducer, -1)
 
 	React.useEffect(() => {
-		if ((newBeep === -1 || typeof newBeep !== 'number') && beep.current > -1) {
-			tones.current[beep.current].pause();
-			tones.current[beep.current].currentTime = 0;
-		}	else if (newBeep > -1) 	{
-			tones.current[newBeep].play();
-		}
-		beep.current = newBeep;
-	}, [newBeep])
+		setPlaying(currentBeep);
+	}, [currentBeep])
 
 	React.useEffect(() => {
 		tones.current.forEach(tone => tone.volume = volume);
 	}, [volume]);
 
+	const clickBeep = React.useRef<number|null>(null);
+
 	function click(index:number) {
+		if (!listening) return;
+
 		readClick(index);
+		clickBeep.current = index;
 		tones.current[index].play();
 		setTimeout(() => {
+			clickBeep.current = null;
 			tones.current[index].pause();
 			tones.current[index].currentTime = 0;
 		}, 200);
@@ -68,7 +89,17 @@ function Board({currentBeep: newBeep, volume, readClick}: {
 
 	return (
 		<div className="game-board">
-			{buttons.map((button:string, index:number) => (<Button key={button} index={index} color={button} beeping={index === newBeep} onClick={click} />))}
+			{buttons.map((button:string, index:number) => {
+				return (
+					<Button 
+						key={button} 
+						index={index} 
+						color={button} 
+						beeping={clickBeep.current ? index === clickBeep.current : index === currentBeep} 
+						onClick={click} 
+					/>
+				);
+			})}
 		</div>
 	);
 }
