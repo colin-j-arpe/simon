@@ -1,5 +1,5 @@
 import React from 'react';
-import './controls.css';
+import './Styles/controls.css';
 
 const gameModes = [
 	{
@@ -166,9 +166,9 @@ function Controls(
 					disabled={gameRunning} 
 				/>
 				<div className="game-options-speed-desc game-options-text">
-					<p>Display Step Duration: {timing.beepDuration}ms</p>
-					<p>Display Step Interval: {timing.beepInterval}ms</p>
-					<p>Input Time Allowed: {timing.inputInterval}ms</p>
+					<p>Display Step Duration: {Math.floor(timing.beepDuration)}ms</p>
+					<p>Display Step Interval: {Math.floor(timing.beepInterval)}ms</p>
+					<p>Input Time Allowed: {Math.floor(timing.inputInterval)}ms</p>
 				</div>
 			</div>
 			<div className="game-options game-options-volume">

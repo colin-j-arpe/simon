@@ -5,6 +5,7 @@ function useGameState() : [
 		running:boolean;
 		showing:boolean;
 		listening:boolean;
+		ending:boolean;
 		score:number;
 	},
 	setGameStatus:{
@@ -18,11 +19,13 @@ function useGameState() : [
 		running:boolean;
 		showing:boolean;
 		listening:boolean;
+		ending:boolean;
 		score:number;
 	}>({
 		running: false,
 		showing: false,
 		listening: false,
+		ending:false,
 		score: 0
 	});
 
@@ -61,8 +64,15 @@ function useGameState() : [
 			running: false,
 			showing: false,
 			listening: false,
+			ending:false,
 			score: finalScore
 		});
+		// setTimeout(() => {
+		// 	setGameStatus({
+		// 		...gameStatus,
+		// 		ending:false
+		// 	});
+		// }, 1000)
 	}
 
 	return [
@@ -99,8 +109,6 @@ function useSequence(
 	const append = React.useRef<boolean>(gameType > -1);
 
 	const addToSequence = () : void => {
-		setCurrentIndex(0);
-
 		const sequenceCopy = [...sequence];
 		for (var i = 0; i < newElementsPerTurn; ++i) {
 			if (append.current) {
@@ -114,6 +122,7 @@ function useSequence(
 		}
 
 		setSequence(sequenceCopy);
+		setCurrentIndex(0);
 	}
 
 	const resetSequence = () : void => {

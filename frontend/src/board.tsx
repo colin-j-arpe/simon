@@ -1,7 +1,7 @@
 import React from 'react';
 
 // import tones from './audio.js';
-import './board.css';
+import './Styles/board.css';
 // import {useAudio} from './hooks';
 
 // import * as toneFiles from "./Audio/*";
@@ -62,11 +62,11 @@ function Board({currentBeep, volume, listening, readClick}: {
 
 		return next;
 	}
-	const [playing, setPlaying] = React.useReducer(toneReducer, -1)
+	const [playing, setPlaying] = React.useReducer(toneReducer, -1);
 
 	React.useEffect(() => {
 		setPlaying(currentBeep);
-	}, [currentBeep])
+	}, [currentBeep]);
 
 	React.useEffect(() => {
 		tones.current.forEach(tone => tone.volume = volume);
@@ -78,13 +78,13 @@ function Board({currentBeep, volume, listening, readClick}: {
 		if (!listening) return;
 
 		readClick(index);
-		clickBeep.current = index;
+		clickBeep.current = currentBeep === 4 ? 4 : index;
 		tones.current[index].play();
 		setTimeout(() => {
 			clickBeep.current = null;
 			tones.current[index].pause();
 			tones.current[index].currentTime = 0;
-		}, 200);
+		}, 250);
 	}
 
 	return (
@@ -95,7 +95,7 @@ function Board({currentBeep, volume, listening, readClick}: {
 						key={button} 
 						index={index} 
 						color={button} 
-						beeping={clickBeep.current ? index === clickBeep.current : index === currentBeep} 
+						beeping={index === (clickBeep.current ?? playing)} 
 						onClick={click} 
 					/>
 				);
