@@ -8,8 +8,8 @@
 }
 
 .game-options 	{
-	width: 18%;
-	min-width: 280px;
+	max-width: 25%;
+	min-width: 300px;
 	margin: 12px;
 }
 
